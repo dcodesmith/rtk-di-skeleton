@@ -1,0 +1,22 @@
+%%{init: {"flowchart": {"curve": "basis"}, "themeVariables": {"fontSize": "15px"}}}%%
+flowchart LR
+  ui["UI<br/>components + hooks"]:::a
+  state["State<br/>RTK store + thunks"]:::b
+  app["Application<br/>use cases"]:::c
+  infra["Infrastructure<br/>repositories + services"]:::d
+  domain["Domain &mdash; pure business rules"]:::e
+
+  ui -- actions --> state
+  state -- data --> ui
+  state -- "DI container (extra)" --> app
+  app --> infra
+
+  app -. uses .-> domain
+  infra -. uses .-> domain
+  ui -. uses .-> domain
+
+  classDef a fill:#e3f2fd,stroke:#1565c0,color:#0d47a1;
+  classDef b fill:#fff3e0,stroke:#ef6c00,color:#e65100;
+  classDef c fill:#ede7f6,stroke:#4527a0,color:#311b92;
+  classDef d fill:#e0f7fa,stroke:#00838f,color:#006064;
+  classDef e fill:#fffde7,stroke:#f9a825,color:#f57f17;
