@@ -1,8 +1,8 @@
 import { describe, it, expect } from 'vitest'
-import { statusReducer } from '../status'
-import { loadCart } from '../thunks/loadCart'
-import { INITIAL, LOADING, NOT_SUBMITTED } from '../../../domain/cart/Cart'
-import { createCart } from '../../../test-support/factories'
+import { statusReducer } from './status'
+import { loadCart } from './thunks/loadCart'
+import { INITIAL, LOADING, NOT_SUBMITTED } from '../../domain/cart/Cart'
+import { createCart } from '../../test-support/factories'
 
 describe('cart/status slice', () => {
   it('starts INITIAL', () => {

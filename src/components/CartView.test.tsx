@@ -1,11 +1,11 @@
 import { describe, it, expect } from 'vitest'
 import { screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { CartView } from '../CartView'
-import { renderWithStore } from '../../test-support/render'
-import { makeTestStore } from '../../test-support/store'
-import { loadCart } from '../../store/cart/thunks/loadCart'
-import { createCart, createCartItem } from '../../test-support/factories'
+import { CartView } from './CartView'
+import { renderWithStore } from '../test-support/render'
+import { makeTestStore } from '../test-support/store'
+import { loadCart } from '../store/cart/thunks/loadCart'
+import { createCart, createCartItem } from '../test-support/factories'
 
 const seededStore = () => {
   const store = makeTestStore()

@@ -1,10 +1,10 @@
 import { describe, it, expect } from 'vitest'
-import { totalsReducer, totalsInitialState } from '../totals'
-import { loadCart } from '../thunks/loadCart'
-import { updateCart } from '../thunks/updateCart'
-import { realtimeMessageReceived } from '../../realtime'
-import { Realtime as RealtimeDomain } from '../../../domain/realtime'
-import { createCart } from '../../../test-support/factories'
+import { totalsReducer, totalsInitialState } from './totals'
+import { loadCart } from './thunks/loadCart'
+import { updateCart } from './thunks/updateCart'
+import { realtimeMessageReceived } from '../realtime'
+import { Realtime as RealtimeDomain } from '../../domain/realtime'
+import { createCart } from '../../test-support/factories'
 
 describe('cart/totals slice', () => {
   const cart = createCart({

@@ -3,10 +3,10 @@ import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { Provider } from 'react-redux'
 import { createRoutesStub } from 'react-router'
-import { routes } from '../routes'
-import { makeTestStore } from '../../test-support/store'
-import { AddItemImpl } from '../../use-cases/cart/addItem'
-import { createCart } from '../../test-support/factories'
+import { routes } from './routes'
+import { makeTestStore } from '../test-support/store'
+import { AddItemImpl } from '../use-cases/cart/addItem'
+import { createCart } from '../test-support/factories'
 
 /**
  * Route-level tests use `createRoutesStub` (the RR-recommended way to give

@@ -1,10 +1,10 @@
 import { describe, it, expect } from 'vitest'
 import { screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { Catalog } from '../Catalog'
-import { renderWithStore } from '../../test-support/render'
-import { AddItemImpl } from '../../use-cases/cart/addItem'
-import { getAllItems } from '../../store/cart/selectors'
+import { Catalog } from './Catalog'
+import { renderWithStore } from '../test-support/render'
+import { AddItemImpl } from '../use-cases/cart/addItem'
+import { getAllItems } from '../store/cart/selectors'
 
 describe('<Catalog />', () => {
   it('loads and lists products from RTK Query', async () => {

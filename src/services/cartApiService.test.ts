@@ -1,10 +1,10 @@
 import { describe, it, expect } from 'vitest'
-import { CartApiServiceImpl, type CartApiService } from '../cartApiService'
+import { CartApiServiceImpl, type CartApiService } from './cartApiService'
 import {
   createConfig,
   createCart,
   createCartItem
-} from '../../test-support/factories'
+} from '../test-support/factories'
 
 describe('CartApiServiceImpl (mock backend)', () => {
   let service: CartApiService

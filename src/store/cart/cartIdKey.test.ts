@@ -1,10 +1,10 @@
 import { describe, it, expect } from 'vitest'
-import { cartIdKeyReducer } from '../cartIdKey'
-import { loadCart } from '../thunks/loadCart'
-import { updateCart } from '../thunks/updateCart'
-import { realtimeMessageReceived } from '../../realtime'
-import { Realtime as RealtimeDomain } from '../../../domain/realtime'
-import { createCart } from '../../../test-support/factories'
+import { cartIdKeyReducer } from './cartIdKey'
+import { loadCart } from './thunks/loadCart'
+import { updateCart } from './thunks/updateCart'
+import { realtimeMessageReceived } from '../realtime'
+import { Realtime as RealtimeDomain } from '../../domain/realtime'
+import { createCart } from '../../test-support/factories'
 
 describe('cart/cartIdKey slice', () => {
   it('starts null', () => {

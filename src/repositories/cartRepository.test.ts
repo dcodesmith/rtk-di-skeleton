@@ -1,13 +1,13 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { CartRepositoryImpl, type CartRepository } from '../cartRepository'
+import { CartRepositoryImpl, type CartRepository } from './cartRepository'
 import type {
   CartApiService,
   BrowserStorageService,
   ServerError
-} from '../../services'
-import { asMock } from '../../test-support/asMock'
-import { createCart, createCartItem } from '../../test-support/factories'
-import { INITIAL } from '../../domain/cart/Cart'
+} from '../services'
+import { asMock } from '../test-support/asMock'
+import { createCart, createCartItem } from '../test-support/factories'
+import { INITIAL } from '../domain/cart/Cart'
 
 describe('CartRepositoryImpl', () => {
   let cartApiService: CartApiService

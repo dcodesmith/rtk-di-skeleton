@@ -4,8 +4,8 @@ import {
   refersToSameItem,
   quantityInCart,
   isInCart
-} from '../Product'
-import { createProduct, createCartItem } from '../../../test-support/factories'
+} from './Product'
+import { createProduct, createCartItem } from '../../test-support/factories'
 
 describe('Product domain', () => {
   describe('#toCartItem', () => {

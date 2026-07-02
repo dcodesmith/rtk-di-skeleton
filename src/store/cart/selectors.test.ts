@@ -1,14 +1,14 @@
 import { describe, it, expect } from 'vitest'
-import { loadCart } from '../thunks/loadCart'
+import { loadCart } from './thunks/loadCart'
 import {
   getAllItems,
   getTotalItems,
   getCartEntity,
   getCartStatus
-} from '../selectors'
-import { makeTestStore } from '../../../test-support/store'
-import { createCart, createCartItem } from '../../../test-support/factories'
-import { NOT_SUBMITTED } from '../../../domain/cart/Cart'
+} from './selectors'
+import { makeTestStore } from '../../test-support/store'
+import { createCart, createCartItem } from '../../test-support/factories'
+import { NOT_SUBMITTED } from '../../domain/cart/Cart'
 
 describe('cart selectors', () => {
   const cart = createCart({

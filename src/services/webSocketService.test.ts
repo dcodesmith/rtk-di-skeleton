@@ -1,10 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import {
-  WebSocketServiceImpl,
-  type WebSocketService
-} from '../webSocketService'
-import { Realtime as RealtimeDomain } from '../../domain/realtime'
-import { createConfig, createCart } from '../../test-support/factories'
+import { WebSocketServiceImpl, type WebSocketService } from './webSocketService'
+import { Realtime as RealtimeDomain } from '../domain/realtime'
+import { createConfig, createCart } from '../test-support/factories'
 
 /** Minimal fake WebSocket that lets tests drive lifecycle callbacks. */
 class FakeWebSocket {

@@ -5,9 +5,9 @@ import {
   realtimeConnected,
   realtimeDisconnected,
   realtimeMessageReceived
-} from '..'
-import { Realtime as RealtimeDomain } from '../../../domain/realtime'
-import { createCart } from '../../../test-support/factories'
+} from '.'
+import { Realtime as RealtimeDomain } from '../../domain/realtime'
+import { createCart } from '../../test-support/factories'
 
 const reducer = realtimeSlice.reducer
 

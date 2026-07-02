@@ -1,8 +1,8 @@
 import { describe, it, expect } from 'vitest'
 import { screen } from '@testing-library/react'
-import { RealtimeBadge } from '../RealtimeBadge'
-import { renderWithStore } from '../../test-support/render'
-import { Realtime as RealtimeDomain } from '../../domain/realtime'
+import { RealtimeBadge } from './RealtimeBadge'
+import { renderWithStore } from '../test-support/render'
+import { Realtime as RealtimeDomain } from '../domain/realtime'
 
 describe('<RealtimeBadge />', () => {
   it('shows "offline" before connecting', () => {

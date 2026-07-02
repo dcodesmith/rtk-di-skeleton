@@ -1,9 +1,9 @@
 import { describe, it, expect, vi } from 'vitest'
-import { LoadCartImpl } from '../loadCart'
-import { UpdateCartImpl } from '../updateCart'
-import type { CartRepository } from '../../../repositories'
-import { asMock } from '../../../test-support/asMock'
-import { createCart } from '../../../test-support/factories'
+import { LoadCartImpl } from './loadCart'
+import { UpdateCartImpl } from './updateCart'
+import type { CartRepository } from '../../repositories'
+import { asMock } from '../../test-support/asMock'
+import { createCart } from '../../test-support/factories'
 
 describe('cart use cases delegate to the repository', () => {
   describe('LoadCartImpl', () => {

@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest'
-import { AddItemImpl, type AddItem } from '../addItem'
-import { MaxItemsReachedError } from '../../../domain/errors'
-import { createProduct, createCartItem } from '../../../test-support/factories'
+import { AddItemImpl, type AddItem } from './addItem'
+import { MaxItemsReachedError } from '../../domain/errors'
+import { createProduct, createCartItem } from '../../test-support/factories'
 
 describe('AddItemImpl', () => {
   let addItem: AddItem

@@ -4,12 +4,12 @@ import {
   initialItemsState,
   itemQuantityChanged,
   itemRemoved
-} from '../items'
-import { addItem } from '../thunks/addItem'
-import { loadCart } from '../thunks/loadCart'
-import { realtimeMessageReceived } from '../../realtime'
-import { Realtime as RealtimeDomain } from '../../../domain/realtime'
-import { createCart, createCartItem } from '../../../test-support/factories'
+} from './items'
+import { addItem } from './thunks/addItem'
+import { loadCart } from './thunks/loadCart'
+import { realtimeMessageReceived } from '../realtime'
+import { Realtime as RealtimeDomain } from '../../domain/realtime'
+import { createCart, createCartItem } from '../../test-support/factories'
 
 const stateWith = (...items: ReturnType<typeof createCartItem>[]) =>
   items.reduce(

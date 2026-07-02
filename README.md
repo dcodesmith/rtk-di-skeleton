@@ -271,8 +271,9 @@ return {
 ```
 
 Components then read the flag (`const { canCheckout } = useCart()`) and never
-re-implement the condition. Every helper has a matching unit test under the
-domain's `__tests__/`, so the rules are verified independently of React.
+re-implement the condition. Every helper has a matching unit test colocated
+beside its source (e.g. `Cart.ts` + `Cart.test.ts`), so the rules are verified
+independently of React.
 
 ## How the DI container works
 
@@ -668,7 +669,9 @@ pnpm test:coverage
 
 **What's covered, and how each layer is tested:**
 
-- **Domain** (`*/__tests__/*.test.ts`) — pure functions, no mocks
+Tests are **colocated** with the code they cover — `Foo.ts` sits next to `Foo.test.ts` (no `__tests__/` folders) — so a module and its spec move and refactor together.
+
+- **Domain** (`src/domain/**/*.test.ts`) — pure functions, no mocks
   (`CartItem`, `Cart`, `Product`, `RealtimeEvent`).
 - **Use cases** — inject `asMock`-ed repositories, assert delegation + rules
   (`addItem` max-items rule; `loadCart`/`updateCart` forwarding).
@@ -685,10 +688,10 @@ pnpm test:coverage
   the container arrives as `extra` and the result folds into real state.
 - **Middleware** — `socketMiddleware` with an injected fake socket service;
   asserts command→lifecycle→event action wiring.
-- **Components** (`src/components/__tests__/`) — Testing Library + `renderWithStore`.
+- **Components** (`src/components/*.test.tsx`) — Testing Library + `renderWithStore`.
   `Catalog` (RTK Query load + add-to-cart through the thunk/DI path), `CartView`
   (quantity/remove interactions), `RealtimeBadge` (status reflection).
-- **Routing** (`src/routes/__tests__/`) — the RR-recommended **`createRoutesStub`**
+- **Routing** (`src/routes/*.test.tsx`) — the RR-recommended **`createRoutesStub`**
   fed the app's real `routes` tree (wrapped in the store `<Provider>`): asserts
   each page renders at its path, nav-link navigation, and the splat 404.
 

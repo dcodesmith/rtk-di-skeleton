@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { BrowserStorageServiceImpl } from '../browserStorageService'
+import { BrowserStorageServiceImpl } from './browserStorageService'
 
 describe('BrowserStorageServiceImpl', () => {
   const service = BrowserStorageServiceImpl()

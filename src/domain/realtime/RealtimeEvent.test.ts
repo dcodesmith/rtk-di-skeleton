@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
-import { parse, serialize, CART_UPDATED, PRICE_CHANGED } from '../RealtimeEvent'
-import { createCart } from '../../../test-support/factories'
+import { parse, serialize, CART_UPDATED, PRICE_CHANGED } from './RealtimeEvent'
+import { createCart } from '../../test-support/factories'
 
 describe('RealtimeEvent domain', () => {
   describe('#parse', () => {

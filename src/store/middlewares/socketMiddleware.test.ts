@@ -1,15 +1,15 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { socketMiddleware } from '../socketMiddleware'
-import type { SocketHandlers, WebSocketService } from '../../../services'
+import { socketMiddleware } from './socketMiddleware'
+import type { SocketHandlers, WebSocketService } from '../../services'
 import {
   realtimeConnectionRequested,
   realtimeDisconnectRequested,
   realtimeConnected,
   realtimeDisconnected,
   realtimeMessageReceived
-} from '../../realtime'
-import { Realtime as RealtimeDomain } from '../../../domain/realtime'
-import { createConfig, createCart } from '../../../test-support/factories'
+} from '../realtime'
+import { Realtime as RealtimeDomain } from '../../domain/realtime'
+import { createConfig, createCart } from '../../test-support/factories'
 
 const makeFakeService = () => {
   let handlers: SocketHandlers = {}

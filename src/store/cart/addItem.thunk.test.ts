@@ -1,10 +1,10 @@
 import { describe, it, expect, vi } from 'vitest'
-import { addItem } from '../thunks/addItem'
-import { AddItemImpl } from '../../../use-cases/cart/addItem'
-import { MaxItemsReachedError } from '../../../domain/errors'
-import { getAllItems } from '../selectors'
-import { makeTestStore } from '../../../test-support/store'
-import { createConfig, createProduct } from '../../../test-support/factories'
+import { addItem } from './thunks/addItem'
+import { AddItemImpl } from '../../use-cases/cart/addItem'
+import { MaxItemsReachedError } from '../../domain/errors'
+import { getAllItems } from './selectors'
+import { makeTestStore } from '../../test-support/store'
+import { createConfig, createProduct } from '../../test-support/factories'
 
 describe('addItem thunk (through the store + DI container)', () => {
   it('delegates to the injected use case and folds the item into state', async () => {

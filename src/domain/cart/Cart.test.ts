@@ -12,8 +12,8 @@ import {
   NOT_SUBMITTED,
   COMPLETED,
   defaultTotals
-} from '../Cart'
-import { createCart, createCartItem } from '../../../test-support/factories'
+} from './Cart'
+import { createCart, createCartItem } from '../../test-support/factories'
 
 describe('Cart domain', () => {
   describe('#create', () => {

@@ -6,8 +6,8 @@ import {
   lineTotal,
   canDecrement,
   isFree
-} from '../CartItem'
-import { createCartItem } from '../../../test-support/factories'
+} from './CartItem'
+import { createCartItem } from '../../test-support/factories'
 
 describe('CartItem domain', () => {
   describe('#createCartItemId', () => {
