@@ -1,11 +1,18 @@
 import { useCart } from '../store/cart/hooks/useCart'
 import { useItems } from '../store/cart/hooks/useItems'
-import { CartItem as CartItemDomain } from '../domain/cart'
+import { CartLineItem } from './CartLineItem'
 
 /**
- * Reads cart state through `useCart` / `useItems`. Quantity/remove mutations
- * flow through the store and auto-trigger a debounced `updateCart` that
- * recomputes totals + tax on the "server".
+ * Container for the cart. Reads cart state through `useCart` / `useItems`
+ * (store-derived values + bound actions), then hands each item down to the
+ * presentational `CartLineItem` as a prop. Quantity/remove mutations flow
+ * through the store and auto-trigger a debounced `updateCart` that recomputes
+ * totals + tax on the "server".
+ *
+ * Note the split: store-derived flags (`isEmpty`, `canCheckout`) come from the
+ * hook here; per-item domain checks live in `CartLineItem`, called directly on
+ * the `item` prop. See README → "Domain functions: call directly, or through a
+ * hook?".
  */
 export const CartView = () => {
   const {
@@ -32,44 +39,14 @@ export const CartView = () => {
       ) : (
         <ul className="list">
           {items.map(item => (
-            <li key={item.id} className="row">
-              <span>{item.name}</span>
-              <span className="spacer" />
-              <div className="qty">
-                <button
-                  type="button"
-                  // Domain rule: quantity can't go below 1, so disable rather
-                  // than dispatch a no-op mutation.
-                  disabled={!CartItemDomain.canDecrement(item)}
-                  onClick={() =>
-                    changeQuantity({ id: item.id, quantity: item.quantity - 1 })
-                  }
-                >
-                  −
-                </button>
-                <span>{item.quantity}</span>
-                <button
-                  type="button"
-                  onClick={() =>
-                    changeQuantity({ id: item.id, quantity: item.quantity + 1 })
-                  }
-                >
-                  +
-                </button>
-              </div>
-              <span className="price">
-                {CartItemDomain.isFree(item)
-                  ? 'Free'
-                  : `$${CartItemDomain.lineTotal(item).toFixed(2)}`}
-              </span>
-              <button
-                type="button"
-                className="link"
-                onClick={() => removeItem(item.id)}
-              >
-                remove
-              </button>
-            </li>
+            <CartLineItem
+              key={item.id}
+              item={item}
+              onChangeQuantity={quantity =>
+                changeQuantity({ id: item.id, quantity })
+              }
+              onRemove={() => removeItem(item.id)}
+            />
           ))}
         </ul>
       )}
