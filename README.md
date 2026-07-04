@@ -251,8 +251,8 @@ Where and how they show up:
 |--------|-----------|---------|-------------------------------|
 | `Cart.hasItems` / `Cart.isEmpty` | `domain/cart/Cart.ts` | `useCart` → `CartView` empty state | One definition of "empty", named for intent. |
 | `Cart.canCheckout` | `domain/cart/Cart.ts` | `useCart` → `CartView` Checkout button | **Composes** `isLoaded && hasItems && !isCompleted` so the "can I check out?" rule lives in one place. |
-| `CartItem.canDecrement` | `domain/cart/CartItem.ts` | `CartView` "−" button | Mirrors the quantity-clamp rule; disables the control instead of dispatching a no-op. |
-| `CartItem.isFree` | `domain/cart/CartItem.ts` | `CartView` line total | Drives "Free" labelling for zero-priced lines. |
+| `CartItem.canDecrement` | `domain/cart/CartItem.ts` | `CartLineItem` "−" button (on the `item` prop) | Mirrors the quantity-clamp rule; disables the control instead of dispatching a no-op. |
+| `CartItem.isFree` | `domain/cart/CartItem.ts` | `CartLineItem` line total (on the `item` prop) | Drives "Free" labelling for zero-priced lines. |
 | `Product.quantityInCart` / `Product.isInCart` | `domain/catalog/Product.ts` | `Catalog` badge + button label | Answers catalog↔cart questions via the shared `refersToSameItem` rule, not ad-hoc `.find()` in JSX. |
 
 The pattern to copy: a hook selects raw state, then derives named booleans/values
@@ -274,6 +274,202 @@ Components then read the flag (`const { canCheckout } = useCart()`) and never
 re-implement the condition. Every helper has a matching unit test colocated
 beside its source (e.g. `Cart.ts` + `Cart.test.ts`), so the rules are verified
 independently of React.
+
+## Domain functions: call directly, or through a hook?
+
+You'll see the same domain functions reached two ways — sometimes wrapped in a
+hook, sometimes called straight from a component. Both are correct; the deciding
+factor is **where the data comes from**, not the component.
+
+> A hook here is really *selector(s) + a domain call*. Wrap a domain function in
+> a hook only when its input lives in the **Redux store**. If the input is
+> already a **prop** (or local value), call the pure function directly — a hook
+> would be pointless indirection.
+
+| Input lives in… | Reach the domain function via | Example |
+|---|---|---|
+| the Redux store | a hook (selector + domain) that returns a derived value | `useCart()` → `Cart.canCheckout(status, totalItems)` |
+| a prop / local value | call it directly in the component | `CartLineItem` → `CartItem.lineTotal(item)` on its `item` prop |
+| a domain type or constant | import directly, always | `CartDomain.INITIAL`, the `CartItem` type |
+
+The store is read **once, high up**, and the result flows down as props. `CartView`
+owns the store-derived flags; `CartLineItem` is a leaf that gets an `item` prop:
+
+```tsx
+// CartView — reads the store via hooks (store-derived flags live here)
+const { isEmpty, canCheckout } = useCart()        // Cart.isEmpty / Cart.canCheckout
+const { items, changeQuantity, removeItem } = useItems()
+// ...hand each item down as a prop:
+items.map(item => <CartLineItem item={item} /* + callbacks */ />)
+
+// CartLineItem — `item` is a PROP, so call domain functions directly
+const CartLineItem = ({ item }) =>
+  CartItemDomain.isFree(item) ? 'Free' : CartItemDomain.lineTotal(item)
+```
+
+**Payoff:** hooks concentrate store-shape knowledge and selector memoization in
+one place, while a leaf that already holds its data stays pure — testable with
+**just props**, no store or `<Provider>` (see `CartLineItem.test.tsx` vs.
+`CartView.test.tsx`, which seeds a store). Adding a hook to a leaf would buy
+indirection and extra re-render coupling for nothing.
+
+A single component can legitimately do **both, per datum**: a cart-level flag
+from a hook *and* an item-level check on a prop directly. That's expected, not an
+inconsistency.
+
+### Another illustration: a nested aggregate that lives in state
+
+The cart is flat, but the pattern shines with **nested aggregates** — a single
+entity in the store whose children you iterate. Read the aggregate **once** at
+the top, then let each child own one element. *(Illustrative only — this type is
+**not** in the codebase; it's here to show the shape.)*
+
+Say the store holds a `Workflow` (think a notebook of steps, a board of columns,
+a pipeline of stages):
+
+```ts
+// domain/workflow/Step.ts — pure, ELEMENT-only rules
+export type StepStatus = 'pending' | 'running' | 'done' | 'failed'
+export type Step = {
+  id: string
+  name: string
+  status: StepStatus
+  dependsOn: string[]
+}
+
+export const isTerminal = (step: Step): boolean =>
+  step.status === 'done' || step.status === 'failed'
+export const isRunning = (step: Step): boolean => step.status === 'running'
+
+// domain/workflow/Workflow.ts — AGGREGATE-level rules span the whole collection
+export type Workflow = { id: number; name: string; steps: Step[] }
+export const isComplete = (wf: Workflow): boolean => wf.steps.every(isTerminal)
+```
+
+```tsx
+// The whole Workflow is ONE entity in the store → one selector, one subscription.
+const useWorkflow = () => {
+  const workflow = useSelector(getWorkflow) // read once, here
+  return {
+    name: workflow.name,
+    steps: workflow.steps,
+    isComplete: WorkflowDomain.isComplete(workflow) // aggregate-scoped → hook
+  }
+}
+
+// Container: reads the store once, hands each element down as a prop.
+const WorkflowView = () => {
+  const { steps } = useWorkflow()
+  return (
+    <ul>
+      {steps.map(step => (
+        <StepItem key={step.id} step={step} />
+      ))}
+    </ul>
+  )
+}
+
+// Leaf: `step` is a PROP → call the Step domain directly (no store, no hook).
+const StepItem = ({ step }: { step: Step }) => (
+  <li className={StepDomain.isRunning(step) ? 'active' : ''}>
+    {step.name} {StepDomain.isTerminal(step) ? '✓' : '…'}
+  </li>
+)
+```
+
+**Why this shape is ideal:**
+
+- The aggregate is one cohesive entity, so it's **one selector and one store
+  subscription** at the container — instead of N subscriptions across leaves.
+  (Those per-leaf subscriptions are the *connected-item* alternative — **approach
+  B** below — which is sometimes exactly what you want.)
+- `StepItem` runs **element-only** predicates (`isTerminal(step)`) on its prop,
+  so it stays pure, `React.memo`-friendly, and unit-testable with nothing but a
+  plain `step` object.
+- Anything that needs the **whole collection** (`isComplete` inspects every step)
+  or another store slice stays in the hook.
+
+Same rule as the cart, applied to nested state: **store/aggregate-scoped → hook;
+element-scoped → call the domain directly on the prop.**
+
+### Getting the element to the child: approach A vs B
+
+The illustration above uses **approach A**. There's a valid alternative,
+**approach B**. They differ only in *how the child gets its element* — the domain
+rule is unchanged: once the child holds `step`, it calls `StepDomain.*` directly
+either way.
+
+**A — parent reads the aggregate, passes the element down as a prop** (as above):
+
+```tsx
+const WorkflowView = () => {
+  const { steps } = useWorkflow() // one subscription: the whole collection
+  return steps.map(step => <StepItem key={step.id} step={step} />)
+}
+const StepItem = ({ step }: { step: Step }) => /* pure, prop-driven */
+```
+
+**B — "connected item": parent renders by id, each child selects its own slice:**
+
+```tsx
+const WorkflowView = () => {
+  const ids = useSelector(getStepIds) // subscribes to the ids only
+  return ids.map(id => <StepItem key={id} id={id} />)
+}
+const StepItem = ({ id }: { id: string }) => {
+  const step = useSelector(state => selectStepById(state, id))
+  return /* still calls StepDomain.*(step) directly */
+}
+```
+
+| | **A — prop-drill** | **B — connected `useStep(id)`** |
+|---|---|---|
+| Parent subscribes to | the whole collection | the list of **ids** only |
+| Child subscribes to | nothing (pure/presentational) | its **own** entity by id |
+| One item changes → | parent re-renders + re-maps N (memoized children bail out) | only that **one** child re-renders |
+| Child reuse / testing | high — render with a plain object, no store | coupled to the store |
+| Ideal for | small/steady lists; reusable leaves | large lists with frequent, **localized** updates |
+
+**When to use which**
+
+- **Default to A.** Simpler, keeps leaves pure and reusable, and with RTK's
+  entity adapter unchanged items keep their references, so `React.memo(StepItem)`
+  already skips unchanged rows.
+- **Reach for B** when the list is large and/or rows update independently (live
+  statuses, prices ticking, collaborative edits) and you want re-renders scoped
+  to the single row that changed. There, the N subscriptions are the *point* —
+  they isolate updates.
+
+**B implies normalizing the aggregate.** With a nested array
+(`{ id, name, steps: Step[] }`), a by-id selector must `find` — O(n) per lookup,
+O(n²) across N connected children:
+
+```ts
+// nested array → a linear find on every lookup
+const selectStepById = (state, id) =>
+  getWorkflow(state).steps.find(s => s.id === id)
+```
+
+So for B, store the collection **keyed by id** instead. This is exactly what
+`createEntityAdapter` gives you (O(1) `selectById` + a stable `selectIds`):
+
+```ts
+// normalized → O(1) lookup, no find
+steps: {
+  ids: ['s1', 's2', 's3'],
+  entities: { s1: {/*…*/}, s2: {/*…*/}, s3: {/*…*/} }
+}
+const selectStepById = (state, id) => getWorkflow(state).steps.entities[id]
+```
+
+Rule of thumb: **A pairs with a nested array; B pairs with normalized
+(entity-adapter) state.** Either way, once the child holds its `step`, it calls
+the element-scoped domain functions directly.
+
+> This repo's cart already uses the normalized shape — see
+> [`itemsAdapter.ts`](src/store/cart/itemsAdapter.ts) and `getItem` in
+> [`selectors.ts`](src/store/cart/selectors.ts) — so switching a cart list to
+> approach B would be a drop-in `selectById`.
 
 ## How the DI container works
 
